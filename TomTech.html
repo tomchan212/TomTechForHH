@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tom Tech - 首頁</title>
+  <script>(function(){try{if(localStorage.getItem('tomtech-theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();</script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Tom Tech</h1>
+      <button type="button" id="theme-btn" class="btn-theme" title="切換深色/淺色模式" aria-label="切換深色模式">深色模式</button>
+    </header>
+    <main class="main">
+      <p class="intro">選擇下方連結開啟各功能頁面：</p>
+      <h2 class="list-title">網站列表</h2>
+      <ul id="site-list" class="site-list" aria-label="子站連結"></ul>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

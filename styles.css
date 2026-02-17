@@ -1,0 +1,127 @@
+/* Tom Tech 首頁 */
+
+:root {
+  --color-bg: #f0f4f8;
+  --color-surface: #fff;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-link-hover-bg: #eff6ff;
+  --radius: 12px;
+  --font-sans: "Segoe UI", "Microsoft JhengHei", PingFang TC, sans-serif;
+}
+
+/* 深色模式 */
+html.dark {
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-primary: #60a5fa;
+  --color-primary-hover: #93c5fd;
+  --color-text: #e2e8f0;
+  --color-text-muted: #94a3b8;
+  --color-border: #334155;
+  --color-link-hover-bg: #1e3a5f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.app {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.header {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.btn-theme {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--color-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.btn-theme:hover {
+  background: var(--color-link-hover-bg);
+  border-color: var(--color-primary);
+}
+
+html.dark .btn-theme {
+  color: var(--color-primary);
+}
+
+.intro {
+  margin: 0 0 8px;
+  color: var(--color-text-muted);
+}
+
+.list-title {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.site-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.site-list a {
+  display: block;
+  padding: 16px 20px;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.site-list a:hover {
+  background: var(--color-link-hover-bg);
+  border-color: var(--color-primary);
+  color: var(--color-primary-hover);
+}
+
+.site-list a:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}

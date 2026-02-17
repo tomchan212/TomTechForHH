@@ -1,0 +1,745 @@
+/* ============================================
+   Add Contacts – 與 ws_money 相同藍色主題 + 對比度
+   ============================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Theme: 藍色主題，與 ws_money 一致，加強對比度 */
+:root {
+  --blue-primary: #2563eb;
+  --blue-dark: #1d4ed8;
+  --blue-light: #3b82f6;
+  --blue-soft: #93c5fd;
+  --bg-warm: #eff6ff;
+  --bg-panel: #ffffff;
+  --border-warm: #93c5fd;
+  --text: #0f172a;
+  --text-muted: #475569;
+  --white: #ffffff;
+  --shadow-soft: 0 1px 3px rgba(37, 99, 235, 0.12);
+  --shadow-card: 0 2px 8px rgba(37, 99, 235, 0.1);
+  --radius: 8px;
+  --input-height: 40px;
+  --space: 16px;
+  --font-sans: "Microsoft JhengHei", "PingFang TC", "Helvetica Neue", sans-serif;
+  --danger: #b91c1c;
+  --danger-hover: #991b1b;
+  --success: #15803d;
+  --success-hover: #166534;
+  --input-bg: #ffffff;
+  --input-text: #0f172a;
+}
+
+/* 深色模式（與 TomTech 同步）：深底淺字，輸入框與內容區皆可讀 */
+html.dark {
+  --blue-primary: #60a5fa;
+  --blue-dark: #3b82f6;
+  --blue-light: #93c5fd;
+  --blue-soft: #1e3a5f;
+  --bg-warm: #0f172a;
+  --bg-panel: #1e293b;
+  --border-warm: #334155;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --white: #f1f5f9;
+  --input-bg: #334155;
+  --input-text: #e2e8f0;
+  --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --danger: #f87171;
+  --danger-hover: #ef4444;
+}
+
+html {
+  height: 100%;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg-warm);
+  padding: 20px;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* ----- Header（與 ws_money 頂部風格一致）----- */
+.header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  background: var(--bg-panel);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-warm);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-home {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--blue-primary);
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-home:hover {
+  background: var(--blue-dark);
+  color: var(--white);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--blue-dark);
+  letter-spacing: 0.02em;
+}
+
+.btn-help {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--blue-primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-help:hover {
+  background: var(--blue-dark);
+}
+
+.main {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+  justify-content: center;
+  align-content: flex-start;
+}
+
+/* ----- Inputs（左欄，與 ws_money 面板風格一致）----- */
+.inputs {
+  flex: 0 1 280px;
+  min-width: 0;
+  max-width: 320px;
+  background: var(--bg-panel);
+  padding: var(--space);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-warm);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+}
+
+.prefix-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.prefix-row label {
+  margin: 0;
+}
+
+.inputs label {
+  display: block;
+  margin-top: var(--space);
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text);
+}
+
+.inputs label:first-of-type {
+  margin-top: 0;
+}
+
+.btn-lock {
+  padding: 4px 10px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--input-bg);
+  border: 1px solid var(--border-warm);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-lock:hover {
+  border-color: var(--blue-light);
+  color: var(--blue-dark);
+}
+
+.btn-lock.is-locked {
+  background: var(--blue-primary);
+  border-color: var(--blue-primary);
+  color: var(--white);
+}
+
+.btn-lock.is-locked:hover {
+  background: var(--blue-dark);
+  border-color: var(--blue-dark);
+  color: var(--white);
+}
+
+.inputs input {
+  width: 100%;
+  min-height: var(--input-height);
+  padding: 8px 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid var(--blue-soft);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--input-text);
+}
+
+.inputs input::placeholder {
+  color: var(--text-muted);
+}
+
+.inputs input:focus {
+  outline: none;
+  border-color: var(--blue-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+}
+
+.inputs input.input-invalid,
+.modal-card input.input-invalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.2);
+}
+
+/* ----- Buttons ----- */
+.btn {
+  min-height: var(--input-height);
+  padding: 8px 16px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--text-muted);
+  color: var(--white);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background: var(--text);
+}
+
+.btn-add {
+  min-height: var(--input-height);
+  font-size: 1.25rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--blue-primary);
+  color: var(--white);
+}
+
+.btn-add:hover,
+.btn-add:focus {
+  background: var(--blue-dark);
+}
+
+.btn-primary {
+  flex: 1;
+  min-width: 0;
+  background: var(--blue-primary);
+  color: var(--white);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: var(--blue-dark);
+}
+
+.actions {
+  margin-top: var(--space);
+}
+
+.actions .btn-add {
+  width: 100%;
+}
+
+/* ----- List（右欄，與 ws_money 表格區風格一致）----- */
+.list-section {
+  flex: 1 1 320px;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  padding: var(--space);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-warm);
+  box-shadow: var(--shadow-card);
+  align-self: flex-start;
+}
+
+.list-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space);
+  margin-bottom: var(--space);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.list-section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.list-section-title-row h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--blue-dark);
+}
+
+.list-section-line {
+  height: 0;
+  border-bottom: 1px solid var(--border-warm);
+  margin-bottom: var(--space);
+}
+
+.contact-list-wrapper {
+  flex: 1;
+  min-height: 200px;
+  min-width: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 6px;
+  border: 1px solid var(--border-warm);
+  background: var(--input-bg);
+}
+
+.contact-table {
+  width: 100%;
+  min-width: 320px;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+/* 表頭：與 ws_money 相同藍底白字、高對比 */
+.contact-table thead {
+  background: var(--blue-dark);
+}
+
+.contact-table th {
+  text-align: left;
+  padding: 12px 10px;
+  font-weight: 700;
+  color: var(--white);
+  border: none;
+  font-size: 0.95rem;
+}
+
+.contact-table th.th-actions {
+  text-align: right;
+}
+
+.contact-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-warm);
+  vertical-align: middle;
+  color: var(--input-text);
+}
+
+.contact-table tbody tr:hover {
+  background: rgba(37, 99, 235, 0.08);
+}
+
+html.dark .contact-table tbody tr:hover {
+  background: rgba(96, 165, 250, 0.12);
+}
+
+.contact-table td.td-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.contact-list-empty {
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  text-align: center;
+  padding: var(--space) !important;
+}
+
+.contact-table .btn-edit,
+.contact-table .btn-delete-inline {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+.contact-table .btn-edit {
+  color: var(--white);
+  background: var(--blue-primary);
+  border: 1px solid var(--blue-primary);
+}
+
+.contact-table .btn-edit:hover {
+  background: var(--blue-dark);
+  border-color: var(--blue-dark);
+  color: var(--white);
+}
+
+.contact-table .btn-delete-inline {
+  color: var(--white);
+  background: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.contact-table .btn-delete-inline:hover {
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+  color: var(--white);
+}
+
+.btn-download {
+  color: var(--white);
+  background: var(--blue-light);
+  border: 1px solid var(--blue-light);
+}
+
+.btn-download:hover,
+.btn-download:focus {
+  background: var(--blue-primary);
+  border-color: var(--blue-primary);
+  color: var(--white);
+}
+
+.btn-reset {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--white);
+  background: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-reset:hover {
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+  color: var(--white);
+}
+
+/* ----- Modals（與 ws_money 彈窗風格一致）----- */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.2s, opacity 0.2s;
+  background: rgba(30, 41, 59, 0.5);
+}
+
+.modal.is-open {
+  visibility: visible;
+  opacity: 1;
+}
+
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  background: var(--bg-panel);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-warm);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.12);
+  padding: var(--space);
+}
+
+.help-modal-card {
+  max-width: 520px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.help-content {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  line-height: 1.65;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.help-content p {
+  margin: 0 0 1em;
+}
+
+.help-content p:last-of-type {
+  margin-bottom: 0;
+}
+
+.help-content ul {
+  margin: 0.5em 0 1em;
+  padding-left: 1.5em;
+}
+
+.help-content li {
+  margin-bottom: 0.35em;
+}
+
+.help-content .help-q {
+  color: var(--blue-dark);
+  font-weight: 700;
+}
+
+.help-content .help-field {
+  color: var(--blue-dark);
+  font-weight: 600;
+}
+
+.help-content .help-btn {
+  color: var(--blue-primary);
+  font-weight: 600;
+}
+
+.help-content .help-warn {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.help-modal-card .modal-actions {
+  flex-shrink: 0;
+  margin-top: var(--space);
+}
+
+.modal-card .modal-title {
+  margin: 0 0 var(--space);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--blue-dark);
+}
+
+.modal-card label {
+  display: block;
+  margin-top: var(--space);
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--input-text);
+}
+
+.modal-card label:first-of-type {
+  margin-top: 0;
+}
+
+.modal-card input {
+  width: 100%;
+  min-height: var(--input-height);
+  padding: 8px 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid var(--blue-soft);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--input-text);
+}
+
+.modal-card input:focus {
+  outline: none;
+  border-color: var(--blue-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--space);
+  margin-top: var(--space);
+  justify-content: flex-end;
+}
+
+.modal-actions .btn {
+  min-width: 80px;
+  min-height: var(--input-height);
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-delete {
+  color: var(--white);
+  background: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.btn-delete:hover,
+.btn-delete:focus {
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+  color: var(--white);
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 768px) {
+  body {
+    padding: 12px;
+  }
+
+  .header h1 {
+    font-size: 1.125rem;
+  }
+
+  .main {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .inputs {
+    max-width: none;
+    flex: 0 0 auto;
+  }
+
+  .list-section {
+    max-width: none;
+    flex: 1 1 0;
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .header {
+    padding: 12px 16px;
+  }
+
+  .header h1 {
+    font-size: 1.0625rem;
+  }
+
+  .btn-help {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+  }
+
+  .list-section-title-row {
+    flex-wrap: wrap;
+  }
+
+  .list-section-header .btn-download,
+  .list-section-header .btn-reset {
+    padding: 6px 10px;
+    font-size: 0.8125rem;
+  }
+
+  .modal-card {
+    max-width: 100%;
+  }
+
+  .help-modal-card {
+    max-width: 100%;
+    max-height: 90vh;
+  }
+
+  .modal-actions .btn {
+    min-width: 70px;
+  }
+
+  .contact-table {
+    min-width: 280px;
+  }
+
+  .contact-table th,
+  .contact-table td {
+    padding: 8px 10px;
+    font-size: 0.875rem;
+  }
+
+  .contact-table .btn-edit,
+  .contact-table .btn-delete-inline {
+    padding: 5px 10px;
+    font-size: 0.8125rem;
+    margin-left: 4px;
+  }
+}
+
+@media (max-width: 360px) {
+  .contact-table {
+    min-width: 260px;
+  }
+}
