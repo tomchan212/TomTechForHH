@@ -13,6 +13,7 @@
       <a href="TomTech.html" class="btn btn-home">首頁</a>
       <h1>Add Contacts</h1>
       <button type="button" id="help-btn" class="btn btn-help">說明</button>
+      <button type="button" id="privacy-btn" class="btn btn-privacy" title="私隱與資料存放說明">私隱說明</button>
     </header>
 
     <main class="main">
@@ -136,6 +137,35 @@
       </div>
       <div class="modal-actions">
         <button type="button" id="help-close" class="btn btn-primary">我知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="privacy-modal" class="modal" aria-hidden="true">
+    <div class="modal-overlay"></div>
+    <div class="modal-card help-modal-card privacy-modal-card">
+      <h3 class="modal-title">🔒 私隱說明</h3>
+      <div class="privacy-content">
+        <p>我們重視您的私隱。本頁面以下列方式處理您的資料，請務必閱讀：</p>
+        <div class="privacy-box privacy-box-local">
+          <strong>📌 資料僅存於本分頁</strong><br>
+          所有您輸入或產生的資料（例如聯絡人前綴、名字、電話號碼等）<strong>僅存放在您目前開啟的「這個瀏覽器分頁」的記憶體中</strong>。我們不會將這些資料寫入您電腦的硬碟或任何長期儲存位置，也不會傳送到任何伺服器。
+        </div>
+        <div class="privacy-box privacy-box-warning">
+          <strong>⚠️ 關閉分頁 → 所有資料會消失</strong><br>
+          當您<strong>關閉此分頁</strong>或關閉瀏覽器視窗時，該分頁的記憶體會被釋放，<strong>所有資料會立即消失，無法復原</strong>。請在關閉前先完成下載 Contact 檔案，並自行保存。
+        </div>
+        <div class="privacy-box privacy-box-warning">
+          <strong>⚠️ 重新整理頁面 → 所有資料也會消失</strong><br>
+          當您按<strong>「重新整理」(F5)</strong>或重新載入本頁時，頁面會重新載入，<strong>暫存於分頁中的資料同樣會全部消失，無法復原</strong>。若需保留資料，請先下載後再進行重新整理。
+        </div>
+        <div class="privacy-box privacy-box-safe">
+          <strong>✅ 我們不會上傳或儲存您的資料</strong><br>
+          本網站<strong>不會</strong>將您的任何資料上傳、儲存或傳送至任何伺服器或第三方。一切資料僅存在於您裝置上該分頁的記憶體中，由您完全掌控。
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="privacy-close" class="btn btn-primary">我知道了</button>
       </div>
     </div>
   </div>

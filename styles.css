@@ -60,6 +60,30 @@ body {
   color: var(--color-text);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-privacy {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: #fff;
+  background: #0d9488;
+  border: 1px solid #0d9488;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-privacy:hover {
+  background: #0f766e;
+  border-color: #0f766e;
+}
+
 .btn-theme {
   padding: 8px 16px;
   font-size: 0.9rem;
@@ -124,4 +148,130 @@ html.dark .btn-theme {
 .site-list a:focus {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* 私隱說明 modal */
+.privacy-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.2s, opacity 0.2s;
+}
+
+.privacy-modal.is-open {
+  visibility: visible;
+  opacity: 1;
+}
+
+.privacy-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 41, 59, 0.5);
+}
+
+.privacy-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  padding: 20px;
+}
+
+.privacy-modal-title {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.privacy-content {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-text);
+}
+
+.privacy-content > p {
+  margin: 0 0 12px;
+}
+
+.privacy-box {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  line-height: 1.6;
+}
+
+.privacy-box-local {
+  background: #ccfbf1;
+  border-left-color: #0d9488;
+  color: #134e4a;
+}
+
+html.dark .privacy-box-local {
+  background: #134e4a;
+  border-left-color: #2dd4bf;
+  color: #99f6e4;
+}
+
+.privacy-box-warning {
+  background: #ffedd5;
+  border-left-color: #c2410c;
+  color: #9a3412;
+}
+
+html.dark .privacy-box-warning {
+  background: #7c2d12;
+  border-left-color: #fb923c;
+  color: #fed7aa;
+}
+
+.privacy-box-safe {
+  background: #dcfce7;
+  border-left-color: #15803d;
+  color: #166534;
+}
+
+html.dark .privacy-box-safe {
+  background: #14532d;
+  border-left-color: #4ade80;
+  color: #bbf7d0;
+}
+
+.privacy-modal-actions {
+  flex-shrink: 0;
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-privacy-close {
+  padding: 8px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: #fff;
+  background: var(--color-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-privacy-close:hover {
+  background: var(--color-primary-hover);
 }

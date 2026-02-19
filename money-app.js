@@ -37,6 +37,9 @@ const btnTemplateDelete = document.getElementById('btnTemplateDelete');
 const helpModal = document.getElementById('helpModal');
 const btnHelp = document.getElementById('btnHelp');
 const btnHelpClose = document.getElementById('btnHelpClose');
+const privacyModal = document.getElementById('privacyModal');
+const btnPrivacy = document.getElementById('btnPrivacy');
+const btnPrivacyClose = document.getElementById('btnPrivacyClose');
 const previewOutput = document.getElementById('previewOutput');
 const btnClear = document.getElementById('btnClear');
 
@@ -603,9 +606,15 @@ function deleteTemplateSlot() {
   templateSlots[currentTemplateSlot] = templateTextarea.value;
   delete templateSlots[currentTemplateSlot];
   const remaining = Object.keys(templateSlots).map(Number).sort((a, b) => a - b);
-  currentTemplateSlot = remaining[0];
-  selectedExportSlot = currentTemplateSlot;
-  templateTextarea.value = templateSlots[currentTemplateSlot] != null ? templateSlots[currentTemplateSlot] : DEFAULT_TEMPLATE;
+  // Renumber: 2,3,4 -> 1,2,3 so labels always show 1,2,3,...
+  const newSlots = {};
+  remaining.forEach((oldNum, i) => {
+    newSlots[i + 1] = templateSlots[oldNum];
+  });
+  templateSlots = newSlots;
+  currentTemplateSlot = 1;
+  selectedExportSlot = 1;
+  templateTextarea.value = templateSlots[1] != null ? templateSlots[1] : DEFAULT_TEMPLATE;
   saveTemplateSlotsToStorage();
   renderTemplateSlotButtons();
   if (remaining.length < MAX_SLOTS) btnSlotAdd.style.display = '';
@@ -629,6 +638,24 @@ helpModal.addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && helpModal.classList.contains('is-open')) closeHelpModal();
+});
+
+// --- 私隱說明 modal ---
+function openPrivacyModal() {
+  privacyModal.classList.add('is-open');
+  privacyModal.setAttribute('aria-hidden', 'false');
+}
+function closePrivacyModal() {
+  privacyModal.classList.remove('is-open');
+  privacyModal.setAttribute('aria-hidden', 'true');
+}
+if (btnPrivacy) btnPrivacy.addEventListener('click', openPrivacyModal);
+if (btnPrivacyClose) btnPrivacyClose.addEventListener('click', closePrivacyModal);
+privacyModal.addEventListener('click', (e) => {
+  if (e.target === privacyModal) closePrivacyModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && privacyModal.classList.contains('is-open')) closePrivacyModal();
 });
 
 btnTemplate.addEventListener('click', openTemplateModal);

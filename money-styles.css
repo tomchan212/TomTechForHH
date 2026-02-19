@@ -332,6 +332,22 @@ button {
   background: var(--red-dark);
 }
 
+.btn-privacy {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #0d9488;
+  background: #0d9488;
+  color: var(--white);
+}
+
+.btn-privacy:hover {
+  background: #0f766e;
+  border-color: #0f766e;
+}
+
 .btn-clear {
   background: var(--red-primary);
   color: var(--white);
@@ -386,6 +402,66 @@ button {
 
 .help-content strong {
   color: var(--red-dark);
+}
+
+/* --- 私隱說明 modal：彩色強調框 --- */
+.privacy-modal-box .modal-title {
+  margin-bottom: 12px;
+}
+
+.privacy-content {
+  padding: 0 18px 10px;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--text);
+}
+
+.privacy-content > p {
+  margin: 0 0 12px;
+}
+
+.privacy-box {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  line-height: 1.6;
+}
+
+.privacy-box-local {
+  background: #ccfbf1;
+  border-left-color: #0d9488;
+  color: #134e4a;
+}
+
+html.dark .privacy-box-local {
+  background: #134e4a;
+  border-left-color: #2dd4bf;
+  color: #99f6e4;
+}
+
+.privacy-box-warning {
+  background: #ffedd5;
+  border-left-color: #c2410c;
+  color: #9a3412;
+}
+
+html.dark .privacy-box-warning {
+  background: #7c2d12;
+  border-left-color: #fb923c;
+  color: #fed7aa;
+}
+
+.privacy-box-safe {
+  background: #dcfce7;
+  border-left-color: #15803d;
+  color: #166534;
+}
+
+html.dark .privacy-box-safe {
+  background: #14532d;
+  border-left-color: #4ade80;
+  color: #bbf7d0;
 }
 
 .filter-bar {

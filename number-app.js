@@ -28,6 +28,10 @@
   const helpModal = document.getElementById('help-modal');
   const helpCloseBtn = document.getElementById('help-close');
   const helpOverlay = helpModal && helpModal.querySelector('.modal-overlay');
+  const privacyBtn = document.getElementById('privacy-btn');
+  const privacyModal = document.getElementById('privacy-modal');
+  const privacyCloseBtn = document.getElementById('privacy-close');
+  const privacyOverlay = privacyModal && privacyModal.querySelector('.modal-overlay');
 
   /** In-memory only; never persisted for confidentiality. */
   let contacts = [];
@@ -307,6 +311,33 @@
       if (e.key === 'Escape') {
         helpModal.classList.remove('is-open');
         helpModal.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
+
+  if (privacyBtn && privacyModal) {
+    privacyBtn.addEventListener('click', function () {
+      privacyModal.classList.add('is-open');
+      privacyModal.setAttribute('aria-hidden', 'false');
+    });
+  }
+  if (privacyCloseBtn) {
+    privacyCloseBtn.addEventListener('click', function () {
+      privacyModal.classList.remove('is-open');
+      privacyModal.setAttribute('aria-hidden', 'true');
+    });
+  }
+  if (privacyOverlay) {
+    privacyOverlay.addEventListener('click', function () {
+      privacyModal.classList.remove('is-open');
+      privacyModal.setAttribute('aria-hidden', 'true');
+    });
+  }
+  if (privacyModal) {
+    privacyModal.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        privacyModal.classList.remove('is-open');
+        privacyModal.setAttribute('aria-hidden', 'true');
       }
     });
   }

@@ -42,6 +42,30 @@
     });
   }
 
+  // 私隱說明 modal
+  var privacyBtn = document.getElementById('privacy-btn');
+  var privacyModal = document.getElementById('privacy-modal');
+  var privacyClose = document.getElementById('privacy-close');
+  var privacyOverlay = privacyModal && privacyModal.querySelector('.privacy-modal-overlay');
+  function openPrivacyModal() {
+    if (privacyModal) {
+      privacyModal.classList.add('is-open');
+      privacyModal.setAttribute('aria-hidden', 'false');
+    }
+  }
+  function closePrivacyModal() {
+    if (privacyModal) {
+      privacyModal.classList.remove('is-open');
+      privacyModal.setAttribute('aria-hidden', 'true');
+    }
+  }
+  if (privacyBtn) privacyBtn.addEventListener('click', openPrivacyModal);
+  if (privacyClose) privacyClose.addEventListener('click', closePrivacyModal);
+  if (privacyOverlay) privacyOverlay.addEventListener('click', closePrivacyModal);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && privacyModal && privacyModal.classList.contains('is-open')) closePrivacyModal();
+  });
+
   // 所有 .html 網站清單（同一資料夾）
   var sites = [
     { name: 'Add Contacts（聯絡人）', file: 'number.html' },
