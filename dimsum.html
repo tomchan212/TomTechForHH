@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#1e3a5f" />
+  <title>一盅兩件落單系統</title>
+  <script>(function(){try{if(localStorage.getItem('tomtech-theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}})();</script>
+  <link rel="stylesheet" href="dimsum.css" />
+</head>
+<body class="app-body">
+  <header class="app-header">
+    <a href="index.html" class="btn-home">首頁</a>
+    <div class="app-header-inner">
+      <h1 class="app-title">一盅兩件落單系統</h1>
+      <p class="app-subtitle">僅供正餐／正餐剪碎院友使用</p>
+    </div>
+  </header>
+
+  <nav class="app-nav" role="tablist">
+    <button type="button" class="nav-btn active" data-tab="list" aria-selected="true">名單管理</button>
+    <button type="button" class="nav-btn" data-tab="order">落單</button>
+    <button type="button" class="nav-btn" data-tab="overview">訂單總覽</button>
+    <button type="button" class="nav-btn" data-tab="notes">注意事項</button>
+  </nav>
+
+  <main class="app-main">
+    <!-- 1. 名單管理 -->
+    <section id="panel-list" class="panel active" role="tabpanel">
+      <div class="upload-row">
+        <label class="upload-btn">
+          <input type="file" id="file-residents" accept=".txt" class="sr-only" />
+          <span>匯入院友名單 (.txt)</span>
+        </label>
+      </div>
+      <div class="list-block">
+        <h2 class="list-title">所有院友名單</h2>
+        <div class="list-body">
+          <div class="list-names" id="list-names-residents"></div>
+        </div>
+      </div>
+      <div class="list-block">
+        <h2 class="list-title">最近需戒口院友</h2>
+        <div class="list-body">
+          <div class="list-edit-row">
+            <textarea id="textarea-restricted" class="list-textarea" placeholder="每行輸入一位院友姓名" rows="4"></textarea>
+            <button type="button" id="btn-save-restricted" class="btn-save-list">儲存戒口名單</button>
+          </div>
+          <div class="list-names" id="list-names-restricted"></div>
+        </div>
+      </div>
+      <div class="list-block">
+        <h2 class="list-title">覆診/外出院友</h2>
+        <div class="list-body">
+          <div class="list-edit-row">
+            <textarea id="textarea-outpatient" class="list-textarea" placeholder="每行輸入一位院友姓名" rows="4"></textarea>
+            <button type="button" id="btn-save-outpatient" class="btn-save-list">儲存覆診/外出名單</button>
+          </div>
+          <div class="list-names" id="list-names-outpatient"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 落單 -->
+    <section id="panel-order" class="panel" role="tabpanel">
+      <div id="order-select-screen" class="order-select-screen">
+        <label class="order-label">選擇院友</label>
+        <input type="text" id="resident-search" class="resident-search" list="resident-datalist" placeholder="輸入姓名搜尋..." autocomplete="off" />
+        <datalist id="resident-datalist"></datalist>
+        <button type="button" id="btn-confirm-resident" class="btn-confirm-resident">確認選擇此院友</button>
+      </div>
+      <div id="order-cart-screen" class="order-cart-screen hidden">
+        <div class="cart-header">
+          <span id="cart-resident-name" class="cart-resident-name"></span>
+          <div class="meal-toggle-wrap">
+            <button type="button" id="meal-regular" class="meal-toggle active">正餐</button>
+            <button type="button" id="meal-pureed" class="meal-toggle">正餐剪碎</button>
+          </div>
+          <button type="button" id="btn-remark" class="btn-remark">備注</button>
+        </div>
+        <div class="items-grid" id="items-grid"></div>
+        <div class="cart-footer">
+          <button type="button" id="btn-cancel-order" class="btn-cancel">取消</button>
+          <button type="button" id="btn-submit-order" class="btn-submit">確認落單</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 訂單總覽 -->
+    <section id="panel-overview" class="panel" role="tabpanel">
+      <div class="overview-actions">
+        <button type="button" id="btn-export-excel" class="btn-export-excel">生成Excel表格</button>
+      </div>
+      <div class="table-wrap table-wrap-overview">
+        <table class="data-table overview-table" id="table-orders">
+          <thead>
+            <tr>
+              <th>院友姓名</th>
+              <th>訂購項目</th>
+              <th>備注</th>
+              <th>狀態</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-orders"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4. 注意事項 -->
+    <section id="panel-notes" class="panel" role="tabpanel">
+      <div class="notes-content" id="notes-content"></div>
+    </section>
+  </main>
+
+  <!-- 備注 Modal -->
+  <div id="remark-modal" class="modal-overlay hidden" aria-hidden="true">
+    <div class="modal-box">
+      <h2 class="modal-title">備注</h2>
+      <textarea id="remark-textarea" class="remark-textarea" placeholder="輸入備注內容..." rows="4"></textarea>
+      <div class="remark-quick-btns">
+        <button type="button" class="remark-quick-btn" data-tag="半份（需另一院友拼單）">半份（需另一院友拼單）</button>
+        <button type="button" class="remark-quick-btn" data-tag="標記為未落住">標記為未落住</button>
+        <button type="button" class="remark-quick-btn" data-tag="純碎餐">純碎餐</button>
+        <button type="button" class="remark-quick-btn" data-tag="駱劉xx類型（吃不完整份）">駱劉xx類型（吃不完整份）</button>
+        <button type="button" class="remark-quick-btn" data-tag="其他">其他</button>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="remark-close" class="btn-secondary">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="dimsum.js"></script>
+</body>
+</html>

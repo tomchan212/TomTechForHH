@@ -69,7 +69,8 @@
   // 所有 .html 網站清單（同一資料夾）
   var sites = [
     { name: 'Add Contacts（聯絡人）', file: 'number.html' },
-    { name: '院友零用金 結欠/結餘 WhatsApp 追數', file: 'ws_money.html' }
+    { name: '院友零用金 結欠/結餘 WhatsApp 追數', file: 'ws_money.html' },
+    { name: '一盅兩件落單系統（點心）', file: 'dimsum.html' }
   ];
 
   var listEl = document.getElementById('site-list');
