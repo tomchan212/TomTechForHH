@@ -23,7 +23,6 @@
   <nav class="app-nav" role="tablist">
     <button type="button" class="nav-btn active" data-tab="list" aria-selected="true">名單管理</button>
     <button type="button" class="nav-btn" data-tab="order">落單</button>
-    <button type="button" class="nav-btn" data-tab="overview">訂單總覽</button>
     <button type="button" class="nav-btn" data-tab="notes">注意事項</button>
   </nav>
 
@@ -67,62 +66,65 @@
       </div>
     </section>
 
-    <!-- 2. 落單 -->
+    <!-- 2. 落單（含選擇院友 + 落單列表於同頁） -->
     <section id="panel-order" class="panel" role="tabpanel">
-      <div id="order-select-screen" class="order-select-screen">
-        <label class="order-label">選擇院友</label>
-        <input type="text" id="resident-search" class="resident-search" list="resident-datalist" placeholder="輸入姓名搜尋..." autocomplete="off" />
-        <datalist id="resident-datalist"></datalist>
-        <button type="button" id="btn-confirm-resident" class="btn-confirm-resident">確認選擇此院友</button>
-      </div>
-      <div id="order-cart-screen" class="order-cart-screen hidden">
-        <div class="cart-header">
-          <span id="cart-resident-name" class="cart-resident-name"></span>
-          <div class="meal-toggle-wrap">
-            <button type="button" id="meal-regular" class="meal-toggle active">正餐</button>
-            <button type="button" id="meal-pureed" class="meal-toggle">正餐剪碎</button>
+      <div class="order-page-layout">
+        <div class="order-flow-column">
+          <div id="order-select-screen" class="order-select-screen">
+            <label class="order-label">選擇院友</label>
+            <input type="text" id="resident-search" class="resident-search" list="resident-datalist" placeholder="輸入姓名搜尋..." autocomplete="off" />
+            <datalist id="resident-datalist"></datalist>
+            <button type="button" id="btn-confirm-resident" class="btn-confirm-resident">確認選擇此院友</button>
           </div>
-          <button type="button" id="btn-remark" class="btn-remark">備注</button>
-        </div>
-        <p class="cart-hint">只可選一項點心</p>
-        <div class="items-grid" id="items-grid"></div>
-        <div class="half-portion-row">
-          <label class="half-portion-label">
-            <input type="checkbox" id="half-portion-checkbox" />
-            <span>半份</span>
-          </label>
-          <div id="share-with-wrap" class="share-with-wrap hidden">
-            <label for="share-with-input">拼單院友：</label>
-            <input type="text" id="share-with-input" class="share-with-input" list="share-with-datalist" placeholder="輸入與誰拼單的院友姓名" autocomplete="off" />
-            <datalist id="share-with-datalist"></datalist>
+          <div id="order-cart-screen" class="order-cart-screen hidden">
+            <div class="cart-header">
+              <span id="cart-resident-name" class="cart-resident-name"></span>
+              <div class="meal-toggle-wrap">
+                <button type="button" id="meal-regular" class="meal-toggle active">正餐</button>
+                <button type="button" id="meal-pureed" class="meal-toggle">正餐剪碎</button>
+              </div>
+              <button type="button" id="btn-remark" class="btn-remark">備注</button>
+            </div>
+            <p class="cart-hint">只可選一項點心</p>
+            <div class="items-grid" id="items-grid"></div>
+            <div class="half-portion-row">
+              <label class="half-portion-label">
+                <input type="checkbox" id="half-portion-checkbox" />
+                <span>半份</span>
+              </label>
+              <div id="share-with-wrap" class="share-with-wrap hidden">
+                <label for="share-with-input">拼單院友：</label>
+                <input type="text" id="share-with-input" class="share-with-input" list="share-with-datalist" placeholder="輸入與誰拼單的院友姓名" autocomplete="off" />
+                <datalist id="share-with-datalist"></datalist>
+              </div>
+            </div>
+            <div class="cart-footer">
+              <button type="button" id="btn-cancel-order" class="btn-cancel">取消</button>
+              <button type="button" id="btn-submit-order" class="btn-submit">確認落單</button>
+            </div>
           </div>
         </div>
-        <div class="cart-footer">
-          <button type="button" id="btn-cancel-order" class="btn-cancel">取消</button>
-          <button type="button" id="btn-submit-order" class="btn-submit">確認落單</button>
+        <div class="order-list-column">
+          <div class="order-list-header">
+            <h2 class="order-list-title">落單列表</h2>
+            <button type="button" id="btn-export-excel" class="btn-export-excel">生成Excel表格</button>
+          </div>
+          <div class="table-wrap table-wrap-overview">
+            <table class="data-table overview-table" id="table-orders">
+              <thead>
+                <tr>
+                  <th>院友姓名</th>
+                  <th>訂購項目</th>
+                  <th>拼單院友</th>
+                  <th>備注</th>
+                  <th>狀態</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-orders"></tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    </section>
-
-    <!-- 3. 訂單總覽 -->
-    <section id="panel-overview" class="panel" role="tabpanel">
-      <div class="overview-actions">
-        <button type="button" id="btn-export-excel" class="btn-export-excel">生成Excel表格</button>
-      </div>
-      <div class="table-wrap table-wrap-overview">
-        <table class="data-table overview-table" id="table-orders">
-          <thead>
-            <tr>
-              <th>院友姓名</th>
-              <th>訂購項目</th>
-              <th>拼單院友</th>
-              <th>備注</th>
-              <th>狀態</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-orders"></tbody>
-        </table>
       </div>
     </section>
 

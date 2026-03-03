@@ -181,10 +181,24 @@
     reader.readAsText(file, 'UTF-8');
   }
 
+  /** 已在落單列表中的院友（主訂單人或拼單院友） */
+  function getNamesInOrderList() {
+    var set = {};
+    state.orders.forEach(function (o) {
+      if (o.residentName) set[o.residentName] = true;
+      if (o.halfPortion && o.shareWith) set[o.shareWith] = true;
+    });
+    return set;
+  }
+
   function renderDatalist() {
     var dl = document.getElementById('resident-datalist');
     if (!dl) return;
-    dl.innerHTML = state.residents.map(function (name) {
+    var inOrderList = getNamesInOrderList();
+    var names = state.residents.filter(function (name) {
+      return !inOrderList[name];
+    });
+    dl.innerHTML = names.map(function (name) {
       return '<option value="' + escapeHtml(name) + '">';
     }).join('');
   }
@@ -253,23 +267,38 @@
     }).join('');
   }
 
-  function renderOrdersTable() {
-    var tbody = document.getElementById('tbody-orders');
-    if (!tbody) return;
-    tbody.innerHTML = state.orders.map(function (o) {
+  /** 取得訂單顯示列（半份時含拼單院友一列，對應者也會出現在名單） */
+  function getOrderDisplayRows() {
+    var rows = [];
+    state.orders.forEach(function (o) {
       var itemStr = (o.items && o.items[0]) ? o.items[0] : '';
       if (o.halfPortion) itemStr = itemStr + (itemStr ? '（半份）' : '半份');
       var shareWithStr = (o.halfPortion && o.shareWith) ? o.shareWith : '—';
-      var remarkWithSituation = appendSituationToRemark(o.remark || '', o.residentName);
-      return '<tr data-order-id="' + escapeHtml(o.id) + '">' +
-        '<td>' + escapeHtml(o.residentName) + '</td>' +
-        '<td>' + escapeHtml(itemStr) + '</td>' +
-        '<td>' + escapeHtml(shareWithStr) + '</td>' +
-        '<td>' + escapeHtml(remarkWithSituation) + '</td>' +
-        '<td>' + escapeHtml(o.status || '已確認') + '</td>' +
+      var mainRemark = appendSituationToRemark(o.remark || '', o.residentName);
+      rows.push({ residentName: o.residentName, itemStr: itemStr, shareWithStr: shareWithStr, remarkWithSituation: mainRemark, status: o.status || '已確認', orderId: o.id });
+      if (o.halfPortion && o.shareWith) {
+        var partnerRemark = appendSituationToRemark(o.remark || '', o.shareWith);
+        rows.push({ residentName: o.shareWith, itemStr: itemStr, shareWithStr: o.residentName, remarkWithSituation: partnerRemark, status: o.status || '已確認', orderId: o.id });
+      }
+    });
+    return rows;
+  }
+
+  function renderOrdersTable() {
+    var tbody = document.getElementById('tbody-orders');
+    if (!tbody) return;
+    var displayRows = getOrderDisplayRows();
+    tbody.innerHTML = displayRows.map(function (r) {
+      return '<tr data-order-id="' + escapeHtml(r.orderId) + '">' +
+        '<td>' + escapeHtml(r.residentName) + '</td>' +
+        '<td>' + escapeHtml(r.itemStr) + '</td>' +
+        '<td>' + escapeHtml(r.shareWithStr) + '</td>' +
+        '<td>' + escapeHtml(r.remarkWithSituation) + '</td>' +
+        '<td>' + escapeHtml(r.status) + '</td>' +
         '<td><button type="button" class="btn-edit" data-action="edit">編輯</button> <button type="button" class="btn-delete" data-action="delete">刪除</button></td>' +
         '</tr>';
     }).join('');
+    renderDatalist();
   }
 
   function openRemarkModal() {
@@ -369,18 +398,18 @@
       return;
     }
     var headers = ['院友姓名', '餐型', '訂購項目', '拼單院友', '備注', '狀態'];
-    var rows = state.orders.map(function (o) {
-      var itemStr = (o.items && o.items[0]) ? o.items[0] : '';
-      if (o.halfPortion) itemStr = itemStr + (itemStr ? '（半份）' : '半份');
-      var remarkWithSituation = appendSituationToRemark(o.remark || '', o.residentName);
-      var shareWith = (o.halfPortion && o.shareWith) ? o.shareWith : '';
+    var displayRows = getOrderDisplayRows();
+    var orderById = {};
+    state.orders.forEach(function (o) { orderById[o.id] = o; });
+    var rows = displayRows.map(function (r) {
+      var o = orderById[r.orderId];
       return [
-        o.residentName || '',
-        o.mealType || '正餐',
-        itemStr,
-        shareWith,
-        remarkWithSituation,
-        o.status || '已確認'
+        r.residentName || '',
+        (o && o.mealType) || '正餐',
+        r.itemStr,
+        r.shareWithStr === '—' ? '' : r.shareWithStr,
+        r.remarkWithSituation,
+        r.status
       ];
     });
     var data = [headers].concat(rows);
