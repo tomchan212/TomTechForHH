@@ -13,6 +13,7 @@
 <body class="app-body">
   <header class="app-header">
     <a href="index.html" class="btn-home">首頁</a>
+    <button type="button" id="btn-reset" class="btn-reset" title="清除所有名單與訂單">重置</button>
     <div class="app-header-inner">
       <h1 class="app-title">一盅兩件落單系統</h1>
       <p class="app-subtitle">僅供正餐／正餐剪碎院友使用</p>
@@ -46,7 +47,10 @@
         <div class="list-body">
           <div class="list-edit-row">
             <textarea id="textarea-restricted" class="list-textarea" placeholder="每行輸入一位院友姓名" rows="4"></textarea>
-            <button type="button" id="btn-save-restricted" class="btn-save-list">儲存戒口名單</button>
+            <div class="list-actions">
+              <button type="button" id="btn-save-restricted" class="btn-save-list">加入名單</button>
+              <button type="button" id="btn-toggle-remove" class="btn-edit-toggle" aria-pressed="true" title="切換顯示移除按鈕">編輯</button>
+            </div>
           </div>
           <div class="list-names" id="list-names-restricted"></div>
         </div>
@@ -56,7 +60,7 @@
         <div class="list-body">
           <div class="list-edit-row">
             <textarea id="textarea-outpatient" class="list-textarea" placeholder="每行輸入一位院友姓名" rows="4"></textarea>
-            <button type="button" id="btn-save-outpatient" class="btn-save-list">儲存覆診/外出名單</button>
+            <button type="button" id="btn-save-outpatient" class="btn-save-list">加入名單</button>
           </div>
           <div class="list-names" id="list-names-outpatient"></div>
         </div>
@@ -80,7 +84,19 @@
           </div>
           <button type="button" id="btn-remark" class="btn-remark">備注</button>
         </div>
+        <p class="cart-hint">只可選一項點心</p>
         <div class="items-grid" id="items-grid"></div>
+        <div class="half-portion-row">
+          <label class="half-portion-label">
+            <input type="checkbox" id="half-portion-checkbox" />
+            <span>半份</span>
+          </label>
+          <div id="share-with-wrap" class="share-with-wrap hidden">
+            <label for="share-with-input">拼單院友：</label>
+            <input type="text" id="share-with-input" class="share-with-input" list="share-with-datalist" placeholder="輸入與誰拼單的院友姓名" autocomplete="off" />
+            <datalist id="share-with-datalist"></datalist>
+          </div>
+        </div>
         <div class="cart-footer">
           <button type="button" id="btn-cancel-order" class="btn-cancel">取消</button>
           <button type="button" id="btn-submit-order" class="btn-submit">確認落單</button>
@@ -99,6 +115,7 @@
             <tr>
               <th>院友姓名</th>
               <th>訂購項目</th>
+              <th>拼單院友</th>
               <th>備注</th>
               <th>狀態</th>
               <th>操作</th>
@@ -124,11 +141,11 @@
         <button type="button" class="remark-quick-btn" data-tag="半份（需另一院友拼單）">半份（需另一院友拼單）</button>
         <button type="button" class="remark-quick-btn" data-tag="標記為未落住">標記為未落住</button>
         <button type="button" class="remark-quick-btn" data-tag="純碎餐">純碎餐</button>
-        <button type="button" class="remark-quick-btn" data-tag="駱劉xx類型（吃不完整份）">駱劉xx類型（吃不完整份）</button>
         <button type="button" class="remark-quick-btn" data-tag="其他">其他</button>
       </div>
       <div class="modal-actions">
         <button type="button" id="remark-close" class="btn-secondary">關閉</button>
+        <button type="button" id="remark-confirm" class="btn-primary">確認</button>
       </div>
     </div>
   </div>

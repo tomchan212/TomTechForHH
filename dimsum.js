@@ -20,9 +20,12 @@
     orders: [],
     currentResident: null,
     currentMealType: '正餐',
-    currentSelections: [],
+    currentSelections: [],   /* 只允許一項，長度 0 或 1 */
     currentRemark: '',
-    editingOrderId: null
+    currentHalfPortion: false,
+    currentShareWith: '',
+    editingOrderId: null,
+    showRemoveButtons: true   /* 名單是否顯示「移除」按鈕 */
   };
 
   function loadFromStorage() {
@@ -53,6 +56,21 @@
     localStorage.setItem(STORAGE_KEYS.orders, JSON.stringify(state.orders));
   }
 
+  function resetAll() {
+    if (!window.confirm('確定要清除所有院友名單、戒口名單、覆診/外出名單與訂單？此操作無法復原。')) return;
+    state.residents = [];
+    state.restricted = [];
+    state.outpatient = [];
+    state.orders = [];
+    saveAll();
+    renderListTables();
+    renderDatalist();
+    renderOrdersTable();
+    document.getElementById('textarea-restricted').value = '';
+    document.getElementById('textarea-outpatient').value = '';
+    showToast('已重置所有名單與訂單');
+  }
+
   function showToast(message) {
     var el = document.getElementById('toast');
     if (!el) return;
@@ -78,28 +96,35 @@
     }
   }
 
-  function renderListNames(containerId, list) {
+  /** listKey: 'restricted' | 'outpatient' 時可編輯；showRemove 為 true 時顯示移除按鈕。姓名從第二格開始。 */
+  function renderListNames(containerId, list, listKey) {
     var el = document.getElementById(containerId);
     if (!el) return;
     if (!list.length) {
       el.innerHTML = '<span class="list-name list-name-empty">（暫無）</span>';
       return;
     }
-    var first = '<span class="list-name">姓名： ' + escapeHtml(list[0]) + '</span>';
-    var rest = list.slice(1).map(function (name) {
-      return '<span class="list-name">' + escapeHtml(name) + '</span>';
+    var editable = (listKey === 'restricted' || listKey === 'outpatient') && state.showRemoveButtons;
+    var labelCell = '<span class="list-name list-name-label">姓名：</span>';
+    var nameCells = list.map(function (name) {
+      return editable
+        ? '<span class="list-name list-name-editable">' + escapeHtml(name) + ' <button type="button" class="list-name-remove" data-list="' + escapeHtml(listKey) + '" data-name="' + escapeHtml(name) + '" title="從名單移除">移除</button></span>'
+        : '<span class="list-name">' + escapeHtml(name) + '</span>';
     }).join('');
-    el.innerHTML = first + rest;
+    el.innerHTML = labelCell + nameCells;
+  }
+
+  function updateRemoveToggleButton() {
+    var btn = document.getElementById('btn-toggle-remove');
+    if (!btn) return;
+    btn.setAttribute('aria-pressed', state.showRemoveButtons ? 'true' : 'false');
   }
 
   function renderListTables() {
     renderListNames('list-names-residents', state.residents);
-    renderListNames('list-names-restricted', state.restricted);
-    renderListNames('list-names-outpatient', state.outpatient);
-    var trEl = document.getElementById('textarea-restricted');
-    var toEl = document.getElementById('textarea-outpatient');
-    if (trEl) trEl.value = state.restricted.join('\n');
-    if (toEl) toEl.value = state.outpatient.join('\n');
+    renderListNames('list-names-restricted', state.restricted, 'restricted');
+    renderListNames('list-names-outpatient', state.outpatient, 'outpatient');
+    /* 戒口/外出 textarea 僅用作輸入新名字，加入後清空，不在此填回名單 */
   }
 
   function parseLines(text) {
@@ -111,6 +136,37 @@
     var div = document.createElement('div');
     div.textContent = s;
     return div.innerHTML;
+  }
+
+  /** 檢查院友是否在戒口或覆診/外出名單 */
+  function getResidentSituation(name) {
+    var n = (name || '').trim();
+    var isRestricted = state.restricted.some(function (r) { return (r || '').trim() === n; });
+    var isOutpatient = state.outpatient.some(function (o) { return (o || '').trim() === n; });
+    return { isRestricted: isRestricted, isOutpatient: isOutpatient };
+  }
+
+  /** 依名單狀態在備注後加上標籤（顯示／匯出時用，不重複追加） */
+  function appendSituationToRemark(remark, residentName) {
+    var sit = getResidentSituation(residentName);
+    var r = (remark || '').trim();
+    if (sit.isOutpatient && r.indexOf('［覆診/外出］') === -1) r = (r ? r + ' ' : '') + '［覆診/外出］';
+    if (sit.isRestricted && r.indexOf('［戒口］') === -1) r = (r ? r + ' ' : '') + '［戒口］';
+    return r;
+  }
+
+  /** 落單前若院友在戒口或外出名單，先詢問是否仍要落單 */
+  function confirmResidentWithAlert(name, onConfirm) {
+    var sit = getResidentSituation(name);
+    var messages = [];
+    if (sit.isRestricted) messages.push('此院友在「最近需戒口」名單中');
+    if (sit.isOutpatient) messages.push('此院友在「覆診/外出」名單中');
+    if (messages.length === 0) {
+      onConfirm();
+      return;
+    }
+    var msg = messages.join('，') + '。確定仍要為其落單？';
+    if (window.confirm(msg)) onConfirm();
   }
 
   function parseTxtFile(file, cb) {
@@ -133,6 +189,16 @@
     }).join('');
   }
 
+  function renderShareWithDatalist() {
+    var dl = document.getElementById('share-with-datalist');
+    if (!dl) return;
+    var current = (state.currentResident || '').trim();
+    var names = state.residents.filter(function (n) { return (n || '').trim() !== current; });
+    dl.innerHTML = names.map(function (name) {
+      return '<option value="' + escapeHtml(name) + '">';
+    }).join('');
+  }
+
   function showOrderSelect() {
     document.getElementById('order-select-screen').classList.remove('hidden');
     document.getElementById('order-cart-screen').classList.add('hidden');
@@ -140,6 +206,8 @@
     state.currentResident = null;
     state.currentSelections = [];
     state.currentRemark = '';
+    state.currentHalfPortion = false;
+    state.currentShareWith = '';
     state.editingOrderId = null;
   }
 
@@ -148,12 +216,16 @@
     state.editingOrderId = orderToEdit ? orderToEdit.id : null;
     if (orderToEdit) {
       state.currentMealType = orderToEdit.mealType || '正餐';
-      state.currentSelections = (orderToEdit.items || []).slice();
+      state.currentSelections = (orderToEdit.items && orderToEdit.items.length) ? [orderToEdit.items[0]] : [];
       state.currentRemark = orderToEdit.remark || '';
+      state.currentHalfPortion = !!orderToEdit.halfPortion;
+      state.currentShareWith = orderToEdit.shareWith || '';
     } else {
       state.currentMealType = '正餐';
       state.currentSelections = [];
       state.currentRemark = '';
+      state.currentHalfPortion = false;
+      state.currentShareWith = '';
     }
     document.getElementById('order-select-screen').classList.add('hidden');
     document.getElementById('order-cart-screen').classList.remove('hidden');
@@ -161,6 +233,13 @@
     document.getElementById('meal-regular').classList.toggle('active', state.currentMealType === '正餐');
     document.getElementById('meal-pureed').classList.toggle('active', state.currentMealType === '正餐剪碎');
     document.getElementById('remark-textarea').value = state.currentRemark;
+    var halfCb = document.getElementById('half-portion-checkbox');
+    var shareWrap = document.getElementById('share-with-wrap');
+    var shareInput = document.getElementById('share-with-input');
+    if (halfCb) halfCb.checked = state.currentHalfPortion;
+    if (shareWrap) shareWrap.classList.toggle('hidden', !state.currentHalfPortion);
+    if (shareInput) shareInput.value = state.currentShareWith;
+    renderShareWithDatalist();
     renderItemButtons();
   }
 
@@ -169,7 +248,8 @@
     if (!grid) return;
     grid.innerHTML = MENU_ITEMS.map(function (item) {
       var selected = state.currentSelections.indexOf(item) !== -1;
-      return '<button type="button" class="item-btn' + (selected ? ' selected' : '') + '" data-item="' + escapeHtml(item) + '">' + escapeHtml(item) + '</button>';
+      var longClass = item.length >= 5 ? ' item-btn-long' : '';
+      return '<button type="button" class="item-btn' + longClass + (selected ? ' selected' : '') + '" data-item="' + escapeHtml(item) + '">' + escapeHtml(item) + '</button>';
     }).join('');
   }
 
@@ -177,11 +257,15 @@
     var tbody = document.getElementById('tbody-orders');
     if (!tbody) return;
     tbody.innerHTML = state.orders.map(function (o) {
-      var itemsStr = (o.items || []).join(' • ');
+      var itemStr = (o.items && o.items[0]) ? o.items[0] : '';
+      if (o.halfPortion) itemStr = itemStr + (itemStr ? '（半份）' : '半份');
+      var shareWithStr = (o.halfPortion && o.shareWith) ? o.shareWith : '—';
+      var remarkWithSituation = appendSituationToRemark(o.remark || '', o.residentName);
       return '<tr data-order-id="' + escapeHtml(o.id) + '">' +
         '<td>' + escapeHtml(o.residentName) + '</td>' +
-        '<td>' + escapeHtml(itemsStr) + '</td>' +
-        '<td>' + escapeHtml(o.remark || '') + '</td>' +
+        '<td>' + escapeHtml(itemStr) + '</td>' +
+        '<td>' + escapeHtml(shareWithStr) + '</td>' +
+        '<td>' + escapeHtml(remarkWithSituation) + '</td>' +
         '<td>' + escapeHtml(o.status || '已確認') + '</td>' +
         '<td><button type="button" class="btn-edit" data-action="edit">編輯</button> <button type="button" class="btn-delete" data-action="delete">刪除</button></td>' +
         '</tr>';
@@ -195,6 +279,11 @@
   }
 
   function closeRemarkModal() {
+    document.getElementById('remark-modal').classList.add('hidden');
+    document.getElementById('remark-modal').setAttribute('aria-hidden', 'true');
+  }
+
+  function confirmRemarkModal() {
     state.currentRemark = document.getElementById('remark-textarea').value.trim();
     document.getElementById('remark-modal').classList.add('hidden');
     document.getElementById('remark-modal').setAttribute('aria-hidden', 'true');
@@ -204,9 +293,9 @@
     return 'o' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
   }
 
-  function deriveStatus(remark, mealType) {
+  function deriveStatus(remark, mealType, halfPortion) {
     if (remark && remark.indexOf('未落住') !== -1) return '未落住';
-    if (remark && remark.indexOf('半份') !== -1) return '半份';
+    if (halfPortion || (remark && remark.indexOf('半份') !== -1)) return '半份';
     if (mealType === '正餐剪碎' || (remark && remark.indexOf('純碎餐') !== -1)) return '剪碎';
     return '已確認';
   }
@@ -216,28 +305,42 @@
     var items = state.currentSelections.slice();
     var remark = state.currentRemark.trim();
     var mealType = state.currentMealType;
+    var halfPortion = !!document.getElementById('half-portion-checkbox').checked;
+    var shareWith = (document.getElementById('share-with-input').value || '').trim();
     if (!name) {
       showToast('請先選擇院友');
       return;
     }
     if (items.length === 0) {
-      showToast('請至少選擇一項點心');
+      showToast('請選擇一項點心');
       return;
     }
-    var status = deriveStatus(remark, mealType);
-    if (state.editingOrderId) {
-      var idx = state.orders.findIndex(function (o) { return o.id === state.editingOrderId; });
-      if (idx !== -1) {
-        state.orders[idx] = { id: state.orders[idx].id, residentName: name, mealType: mealType, items: items, remark: remark, status: status };
-      }
-      showToast('訂單已更新');
-    } else {
-      state.orders.push({ id: generateId(), residentName: name, mealType: mealType, items: items, remark: remark, status: status });
-      showToast('落單成功');
+    if (items.length > 1) {
+      items = [items[0]];
     }
-    saveAll();
-    renderOrdersTable();
-    showOrderSelect();
+    if (halfPortion && !shareWith) {
+      showToast('半份必須填寫拼單院友姓名');
+      return;
+    }
+    state.currentHalfPortion = halfPortion;
+    state.currentShareWith = shareWith;
+    function doSubmit() {
+      var status = deriveStatus(remark, mealType, halfPortion);
+      if (state.editingOrderId) {
+        var idx = state.orders.findIndex(function (o) { return o.id === state.editingOrderId; });
+        if (idx !== -1) {
+          state.orders[idx] = { id: state.orders[idx].id, residentName: name, mealType: mealType, items: items, remark: remark, halfPortion: halfPortion, shareWith: halfPortion ? shareWith : '', status: status };
+        }
+        showToast('訂單已更新');
+      } else {
+        state.orders.push({ id: generateId(), residentName: name, mealType: mealType, items: items, remark: remark, halfPortion: halfPortion, shareWith: halfPortion ? shareWith : '', status: status });
+        showToast('落單成功');
+      }
+      saveAll();
+      renderOrdersTable();
+      showOrderSelect();
+    }
+    confirmResidentWithAlert(name, doSubmit);
   }
 
   function renderNotesContent() {
@@ -253,7 +356,7 @@
       '<div class="check-item"><span class="check-icon">✓</span><span>確認院友為正餐或正餐剪碎，並未在戒口/覆診名單中需排除。</span></div>' +
       '<div class="check-item"><span class="check-icon">✓</span><span>半份或需拼單時，請在備注中註明「半份（需另一院友拼單）」。</span></div>' +
       '<div class="check-item"><span class="check-icon">✓</span><span>若暫未落住，請在備注選「標記為未落住」。</span></div>' +
-      '<div class="check-item"><span class="check-icon">✓</span><span>純碎餐或駱劉xx類型（吃不完整份）等特殊情況，請在備注中清楚標示。</span></div>' +
+      '<div class="check-item"><span class="check-icon">✓</span><span>純碎餐等特殊情況，請在備注中清楚標示。</span></div>' +
       '<div class="check-item"><span class="check-icon">✓</span><span>落單完成後請在訂單總覽再次核對，並生成Excel存檔備查。</span></div>' +
       '<div class="reminder-box">落單後請樓層主管、ST馮姑娘、兩位社工過目。</div>';
     var el = document.getElementById('notes-content');
@@ -265,19 +368,24 @@
       showToast('Excel 庫未載入');
       return;
     }
-    var headers = ['院友姓名', '餐型', '訂購項目', '備注', '狀態'];
+    var headers = ['院友姓名', '餐型', '訂購項目', '拼單院友', '備注', '狀態'];
     var rows = state.orders.map(function (o) {
+      var itemStr = (o.items && o.items[0]) ? o.items[0] : '';
+      if (o.halfPortion) itemStr = itemStr + (itemStr ? '（半份）' : '半份');
+      var remarkWithSituation = appendSituationToRemark(o.remark || '', o.residentName);
+      var shareWith = (o.halfPortion && o.shareWith) ? o.shareWith : '';
       return [
         o.residentName || '',
         o.mealType || '正餐',
-        (o.items || []).join(' • '),
-        o.remark || '',
+        itemStr,
+        shareWith,
+        remarkWithSituation,
         o.status || '已確認'
       ];
     });
     var data = [headers].concat(rows);
     var ws = XLSX.utils.aoa_to_sheet(data);
-    var colWidths = [{ wch: 14 }, { wch: 12 }, { wch: 36 }, { wch: 20 }, { wch: 10 }];
+    var colWidths = [{ wch: 14 }, { wch: 12 }, { wch: 20 }, { wch: 12 }, { wch: 20 }, { wch: 10 }];
     ws['!cols'] = colWidths;
     var wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, '訂單總覽');
@@ -293,6 +401,7 @@
       });
     });
 
+    document.getElementById('btn-reset').addEventListener('click', resetAll);
     document.getElementById('file-residents').addEventListener('change', function (e) {
       var file = e.target.files[0];
       if (!file) return;
@@ -305,19 +414,68 @@
       });
       e.target.value = '';
     });
+    document.getElementById('btn-toggle-remove').addEventListener('click', function () {
+      state.showRemoveButtons = !state.showRemoveButtons;
+      renderListTables();
+      updateRemoveToggleButton();
+      showToast(state.showRemoveButtons ? '已開啟編輯' : '已關閉編輯');
+    });
     document.getElementById('btn-save-restricted').addEventListener('click', function () {
       var text = document.getElementById('textarea-restricted').value || '';
-      state.restricted = parseLines(text);
+      var names = parseLines(text);
+      if (!names.length) {
+        showToast('請輸入院友姓名後再加入');
+        return;
+      }
+      var added = 0;
+      names.forEach(function (name) {
+        if (name && state.restricted.indexOf(name) === -1) { state.restricted.push(name); added++; }
+      });
+      document.getElementById('textarea-restricted').value = '';
       saveAll();
       renderListTables();
-      showToast('已儲存戒口名單，共 ' + state.restricted.length + ' 人');
+      showToast('已加入 ' + added + ' 人到戒口名單（名單現有 ' + state.restricted.length + ' 人）');
     });
     document.getElementById('btn-save-outpatient').addEventListener('click', function () {
       var text = document.getElementById('textarea-outpatient').value || '';
-      state.outpatient = parseLines(text);
+      var names = parseLines(text);
+      if (!names.length) {
+        showToast('請輸入院友姓名後再加入');
+        return;
+      }
+      var added = 0;
+      names.forEach(function (name) {
+        if (name && state.outpatient.indexOf(name) === -1) { state.outpatient.push(name); added++; }
+      });
+      document.getElementById('textarea-outpatient').value = '';
       saveAll();
       renderListTables();
-      showToast('已儲存覆診/外出名單，共 ' + state.outpatient.length + ' 人');
+      showToast('已加入 ' + added + ' 人到覆診/外出名單（名單現有 ' + state.outpatient.length + ' 人）');
+    });
+
+    document.getElementById('list-names-restricted').addEventListener('click', function (e) {
+      var btn = e.target.closest('.list-name-remove');
+      if (!btn) return;
+      var name = btn.getAttribute('data-name');
+      var listKey = btn.getAttribute('data-list');
+      if (listKey === 'restricted' && name) {
+        state.restricted = state.restricted.filter(function (n) { return n !== name; });
+        saveAll();
+        renderListTables();
+        showToast('已從戒口名單移除：' + name);
+      }
+    });
+    document.getElementById('list-names-outpatient').addEventListener('click', function (e) {
+      var btn = e.target.closest('.list-name-remove');
+      if (!btn) return;
+      var name = btn.getAttribute('data-name');
+      var listKey = btn.getAttribute('data-list');
+      if (listKey === 'outpatient' && name) {
+        state.outpatient = state.outpatient.filter(function (n) { return n !== name; });
+        saveAll();
+        renderListTables();
+        showToast('已從覆診/外出名單移除：' + name);
+      }
     });
 
     document.getElementById('btn-confirm-resident').addEventListener('click', function () {
@@ -327,7 +485,7 @@
         showToast('請輸入或選擇院友姓名');
         return;
       }
-      showOrderCart(name, null);
+      confirmResidentWithAlert(name, function () { showOrderCart(name, null); });
     });
 
     document.getElementById('meal-regular').addEventListener('click', function () {
@@ -346,13 +504,31 @@
       if (!btn) return;
       var item = btn.getAttribute('data-item');
       var idx = state.currentSelections.indexOf(item);
-      if (idx === -1) state.currentSelections.push(item);
-      else state.currentSelections.splice(idx, 1);
+      if (idx !== -1) {
+        state.currentSelections = [];
+      } else {
+        state.currentSelections = [item];
+      }
       renderItemButtons();
+    });
+
+    document.getElementById('half-portion-checkbox').addEventListener('change', function () {
+      state.currentHalfPortion = this.checked;
+      var wrap = document.getElementById('share-with-wrap');
+      if (wrap) wrap.classList.toggle('hidden', !this.checked);
+      if (!this.checked) {
+        state.currentShareWith = '';
+        var shareInput = document.getElementById('share-with-input');
+        if (shareInput) shareInput.value = '';
+      }
+    });
+    document.getElementById('share-with-input').addEventListener('input', function () {
+      state.currentShareWith = (this.value || '').trim();
     });
 
     document.getElementById('btn-remark').addEventListener('click', openRemarkModal);
     document.getElementById('remark-close').addEventListener('click', closeRemarkModal);
+    document.getElementById('remark-confirm').addEventListener('click', confirmRemarkModal);
     document.getElementById('remark-modal').addEventListener('click', function (e) {
       if (e.target.id === 'remark-modal') closeRemarkModal();
     });
@@ -396,6 +572,7 @@
     renderOrdersTable();
     renderNotesContent();
     bindEvents();
+    updateRemoveToggleButton();
   }
 
   if (document.readyState === 'loading') {
