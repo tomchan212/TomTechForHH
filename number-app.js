@@ -12,6 +12,8 @@
   const nameInput = document.getElementById('name');
   const numberInput = document.getElementById('number');
   const addRowBtn = document.getElementById('add-row');
+  const pasteExcel = document.getElementById('paste-excel');
+  const importPasteBtn = document.getElementById('import-paste');
   const exportBtn = document.getElementById('export-add');
   const resetListBtn = document.getElementById('reset-list');
   const prefixLockBtn = document.getElementById('prefix-lock');
@@ -228,6 +230,49 @@
     numberInput.value = '';
     prefixInput.focus();
   });
+
+  function looksLikeHeader(name, number) {
+    var blob = ((name || '') + ' ' + (number || '')).toLowerCase();
+    return /姓名|名字|名稱|name|電話|號碼|手機|number|phone|tel/.test(blob) && !isValidNumber((number || '').trim());
+  }
+
+  function importPastedExcel() {
+    var text = (pasteExcel && pasteExcel.value) || '';
+    var lines = text.split(/\r?\n/);
+    var prefix = (prefixInput.value || '').trim();
+    var added = 0;
+    var skipped = 0;
+    var seenData = false;
+
+    lines.forEach(function (line) {
+      if (!line.trim()) return;
+      var parts = line.split('\t');
+      if (parts.length < 2) {
+        parts = line.trim().split(/\s{2,}/);
+      }
+      var name = (parts[0] || '').trim();
+      var number = (parts[1] || '').trim();
+      if (!seenData && looksLikeHeader(name, number)) {
+        seenData = true;
+        return;
+      }
+      seenData = true;
+      if (parts.length < 2 || !isValidNumber(number) || !number) {
+        skipped += 1;
+        return;
+      }
+      contacts.push({ prefix: prefix, name: name, number: number });
+      added += 1;
+    });
+
+    renderList();
+    if (pasteExcel) pasteExcel.value = '';
+    alert('已匯入 ' + added + ' 筆。\n跳過 ' + skipped + ' 筆（電話有空格、橫線、文字，或不是兩欄）。');
+  }
+
+  if (importPasteBtn) {
+    importPasteBtn.addEventListener('click', importPastedExcel);
+  }
 
   if (prefixLockBtn) {
     prefixLockBtn.addEventListener('click', function () {
