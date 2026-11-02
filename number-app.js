@@ -234,7 +234,17 @@
 
   function looksLikeHeader(name, number) {
     var blob = ((name || '') + ' ' + (number || '')).toLowerCase();
-    return /姓名|名字|名稱|name|電話|號碼|手機|number|phone|tel/.test(blob) && !isValidNumber((number || '').trim());
+    return /姓名|名字|名稱|name|電話|號碼|手機|number|phone|tel/.test(blob) && !isValidNumber(normalizeNumber(number));
+  }
+
+  function normalizeNumber(raw) {
+    return String(raw || '')
+      .replace(/[\u00a0\u3000]/g, '')
+      .trim()
+      .replace(/[ \t\-().]/g, '')
+      .replace(/[０-９]/g, function (ch) {
+        return String.fromCharCode(ch.charCodeAt(0) - 0xfee0);
+      });
   }
 
   function importPastedExcel() {
@@ -251,7 +261,7 @@
 
     for (var i = start; i < count; i++) {
       var name = (names[i] || '').trim();
-      var number = (numbers[i] || '').trim();
+      var number = normalizeNumber(numbers[i] || '');
       if (!name && !number) continue;
       if (!isValidNumber(number) || !number) {
         skipped += 1;
@@ -262,9 +272,13 @@
     }
 
     renderList();
+    var listSection = listEl && listEl.closest('.list-section');
+    if (listSection && listSection.scrollIntoView) {
+      listSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
     if (pasteNames) pasteNames.value = '';
     if (pasteNumbers) pasteNumbers.value = '';
-    alert('已匯入 ' + added + ' 筆。\n跳過 ' + skipped + ' 筆（電話有空格、橫線、文字，或對不到姓名）。');
+    alert('已匯入 ' + added + ' 筆，已顯示在右邊名單。\n跳過 ' + skipped + ' 筆（整理後仍不是電話號碼）。');
   }
 
   if (importPasteBtn) {

@@ -399,11 +399,10 @@ body {
 }
 
 .contact-list-wrapper {
-  flex: 1;
-  min-height: 200px;
+  flex: 1 0 auto;
+  min-height: 0;
   min-width: 0;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
   border-radius: 6px;
   border: 1px solid var(--border-warm);
   background: var(--input-bg);
