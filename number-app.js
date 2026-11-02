@@ -9,6 +9,7 @@
   'use strict';
 
   const prefixInput = document.getElementById('prefix');
+  const afterfixInput = document.getElementById('afterfix');
   const nameInput = document.getElementById('name');
   const numberInput = document.getElementById('number');
   const addRowBtn = document.getElementById('add-row');
@@ -21,6 +22,7 @@
   const listEl = document.getElementById('contact-list');
   const editModal = document.getElementById('edit-modal');
   const editPrefix = document.getElementById('edit-prefix');
+  const editAfterfix = document.getElementById('edit-afterfix');
   const editName = document.getElementById('edit-name');
   const editNumber = document.getElementById('edit-number');
   const editSaveBtn = document.getElementById('edit-save');
@@ -51,7 +53,7 @@
     if (contacts.length === 0) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
-      td.colSpan = 4;
+      td.colSpan = 5;
       td.className = 'contact-list-empty';
       td.textContent = 'No contacts yet. Enter Prefix, Name and Number, then click +.';
       tr.appendChild(td);
@@ -65,6 +67,8 @@
       tdPrefix.textContent = c.prefix || '';
       const tdName = document.createElement('td');
       tdName.textContent = c.name || '';
+      const tdAfterfix = document.createElement('td');
+      tdAfterfix.textContent = c.afterfix || '';
       const tdNumber = document.createElement('td');
       tdNumber.textContent = c.number || '';
       const tdActions = document.createElement('td');
@@ -76,6 +80,7 @@
       editBtn.addEventListener('click', function () {
         editingIndex = index;
         editPrefix.value = c.prefix || '';
+        editAfterfix.value = c.afterfix || '';
         editName.value = c.name || '';
         editNumber.value = c.number || '';
         editModal.classList.add('is-open');
@@ -94,6 +99,7 @@
       tdActions.appendChild(deleteBtn);
       tr.appendChild(tdPrefix);
       tr.appendChild(tdName);
+      tr.appendChild(tdAfterfix);
       tr.appendChild(tdNumber);
       tr.appendChild(tdActions);
       listEl.appendChild(tr);
@@ -116,14 +122,25 @@
     alert('請只輸入數字（Number 欄位僅接受數字，可選開頭 + 號）。\nPlease enter numbers only (optional leading +).');
   }
 
-  /** vCard FN = prefix+name (e.g. HHBUPeter), TEL = number. */
+  /** Display name: "AIA Peter (mk)". */
+  function formatContactName(prefix, name, afterfix) {
+    var parts = [];
+    if (prefix) parts.push(prefix);
+    if (name) parts.push(name);
+    var fullName = parts.join(' ');
+    if (afterfix) fullName = (fullName ? fullName + ' ' : '') + '(' + afterfix + ')';
+    return fullName;
+  }
+
+  /** vCard FN = prefix + name + (afterfix), TEL = number. */
   function buildVCard(contacts) {
     return contacts
       .map(function (c) {
         const prefix = (c.prefix || '').trim();
         const name = (c.name || '').trim();
+        const afterfix = (c.afterfix || '').trim();
         const number = (c.number || '').trim();
-        const fullName = prefix + name; // stored as e.g. HHBUPeter
+        const fullName = formatContactName(prefix, name, afterfix);
         const fn = fullName || number || 'Unknown';
         const n = fullName ? ';' + fullName + ';;' : ';;;';
         return (
@@ -215,9 +232,10 @@
 
   addRowBtn.addEventListener('click', function () {
     var prefix = (prefixInput.value || '').trim();
+    var afterfix = (afterfixInput.value || '').trim();
     var name = (nameInput.value || '').trim();
     var number = (numberInput.value || '').trim();
-    if (!prefix && !name && !number) return;
+    if (!prefix && !afterfix && !name && !number) return;
     if (!isValidNumber(number)) {
       showNumberAlert();
       numberInput.focus();
@@ -251,6 +269,7 @@
     var names = ((pasteNames && pasteNames.value) || '').split(/\r?\n/);
     var numbers = ((pasteNumbers && pasteNumbers.value) || '').split(/\r?\n/);
     var prefix = (prefixInput.value || '').trim();
+    var afterfix = (afterfixInput.value || '').trim();
     var added = 0;
     var skipped = 0;
     var count = Math.max(names.length, numbers.length);
@@ -267,7 +286,7 @@
         skipped += 1;
         continue;
       }
-      contacts.push({ prefix: prefix, name: name, number: number });
+      contacts.push({ prefix: prefix, afterfix: afterfix, name: name, number: number });
       added += 1;
     }
 
@@ -295,6 +314,7 @@
 
   editSaveBtn.addEventListener('click', function () {
     var prefix = (editPrefix.value || '').trim();
+    var afterfix = (editAfterfix.value || '').trim();
     var name = (editName.value || '').trim();
     var number = (editNumber.value || '').trim();
     if (!isValidNumber(number)) {
@@ -304,7 +324,7 @@
     }
     if (editingIndex !== null) {
       editNumber.classList.remove('input-invalid');
-      contacts[editingIndex] = { prefix: prefix, name: name, number: number };
+      contacts[editingIndex] = { prefix: prefix, afterfix: afterfix, name: name, number: number };
       renderList();
     }
     closeEditModal();

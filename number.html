@@ -30,6 +30,14 @@
           autofocus
         >
 
+        <label for="afterfix">Afterfix</label>
+        <input
+          id="afterfix"
+          type="text"
+          placeholder="e.g. mk"
+          autocomplete="off"
+        >
+
         <label for="name">Name</label>
         <input
           id="name"
@@ -85,6 +93,7 @@
               <tr>
                 <th>Prefix</th>
                 <th>Name</th>
+                <th>Afterfix</th>
                 <th>Number</th>
                 <th class="th-actions">操作</th>
               </tr>
@@ -102,6 +111,8 @@
       <h3 class="modal-title">編輯</h3>
       <label for="edit-prefix">Prefix</label>
       <input id="edit-prefix" type="text" placeholder="e.g. 義工" autocomplete="off">
+      <label for="edit-afterfix">Afterfix</label>
+      <input id="edit-afterfix" type="text" placeholder="e.g. mk" autocomplete="off">
       <label for="edit-name">Name</label>
       <input id="edit-name" type="text" placeholder="Contact name" autocomplete="name">
       <label for="edit-number">Number</label>
@@ -124,13 +135,14 @@
 
         <p><span class="help-q">左邊三個空格是什麼？</span></p>
         <ul>
-          <li><span class="help-field">Prefix（前綴）：</span> 例如這個人是「義工」或「公司」，你打一個短短的標籤。</li>
-          <li><span class="help-field">Name（名字）：</span> 打這個人的名字，例如「小明」。</li>
+          <li><span class="help-field">Prefix（前綴）：</span> 例如「AIA」，會放在名字前面。</li>
+          <li><span class="help-field">Afterfix（後綴）：</span> 例如「mk」，下載後會變成括號，例如 <span class="help-field">AIA Peter (mk)</span>。</li>
+          <li><span class="help-field">Name（名字）：</span> 打這個人的名字，例如「Peter」。</li>
           <li><span class="help-field">Number（號碼）：</span> 打這個人的電話號碼。<span class="help-warn">只能打數字</span>，不能打英文字或符號（可以打一個 + 在最前面，例如 +852）。</li>
         </ul>
 
         <p><span class="help-q">從 Excel 貼上怎麼用？</span><br>
-        在 Excel 先複製姓名那一欄，貼進<span class="help-field">「姓名」</span>；再複製電話那一欄，貼進<span class="help-field">「電話」</span>。兩欄要同一順序，一行對一行，然後按<span class="help-btn">「匯入」</span>。每一筆都會套用上面那個 <span class="help-field">Prefix</span>，並加在右邊名單後面。第一行如果是標題（例如「姓名」「電話」）會自動略過。電話有空格、橫線或文字的那一行會跳過，匯入後會告訴你跳過了幾筆。</p>
+        在 Excel 先複製姓名那一欄，貼進<span class="help-field">「姓名」</span>；再複製電話那一欄，貼進<span class="help-field">「電話」</span>。兩欄要同一順序，一行對一行，然後按<span class="help-btn">「匯入」</span>。每一筆都會套用上面的 <span class="help-field">Prefix</span> 和 <span class="help-field">Afterfix</span>，並加在右邊名單後面。第一行如果是標題（例如「姓名」「電話」）會自動略過。電話有空格、橫線或文字的那一行會跳過，匯入後會告訴你跳過了幾筆。</p>
 
         <p><span class="help-q">按「+」按鈕會怎樣？</span><br>
         你填好上面三個空格之後，按一下左邊那個大大的<span class="help-btn">「+」</span>按鈕，這一筆「前綴 + 名字 + 號碼」就會被加進右邊的<span class="help-field">「加入名單」</span>表格裡。加完之後，左邊三個空格會清空，你可以繼續打下一筆。</p>
