@@ -14,6 +14,7 @@
   const numberInput = document.getElementById('number');
   const addRowBtn = document.getElementById('add-row');
   const pasteNames = document.getElementById('paste-names');
+  const pasteAfterfix = document.getElementById('paste-afterfix');
   const pasteNumbers = document.getElementById('paste-numbers');
   const importPasteBtn = document.getElementById('import-paste');
   const exportBtn = document.getElementById('export-add');
@@ -242,7 +243,7 @@
       return;
     }
     numberInput.classList.remove('input-invalid');
-    contacts.push({ prefix: prefix, name: name, number: number });
+    contacts.push({ prefix: prefix, afterfix: afterfix, name: name, number: number });
     renderList();
     if (!prefixLocked) prefixInput.value = '';
     nameInput.value = '';
@@ -252,7 +253,7 @@
 
   function looksLikeHeader(name, number) {
     var blob = ((name || '') + ' ' + (number || '')).toLowerCase();
-    return /姓名|名字|名稱|name|電話|號碼|手機|number|phone|tel/.test(blob) && !isValidNumber(normalizeNumber(number));
+    return /姓名|名字|名稱|name|afterfix|後綴|電話|號碼|手機|number|phone|tel/.test(blob) && !isValidNumber(normalizeNumber(number));
   }
 
   function normalizeNumber(raw) {
@@ -267,26 +268,29 @@
 
   function importPastedExcel() {
     var names = ((pasteNames && pasteNames.value) || '').split(/\r?\n/);
+    var afterfixes = ((pasteAfterfix && pasteAfterfix.value) || '').split(/\r?\n/);
     var numbers = ((pasteNumbers && pasteNumbers.value) || '').split(/\r?\n/);
     var prefix = (prefixInput.value || '').trim();
-    var afterfix = (afterfixInput.value || '').trim();
+    var fallbackAfterfix = (afterfixInput.value || '').trim();
     var added = 0;
     var skipped = 0;
-    var count = Math.max(names.length, numbers.length);
+    var count = Math.max(names.length, afterfixes.length, numbers.length);
     var start = 0;
     var firstName = (names[0] || '').trim();
+    var firstAfterfix = (afterfixes[0] || '').trim();
     var firstNumber = (numbers[0] || '').trim();
-    if (count > 0 && looksLikeHeader(firstName, firstNumber)) start = 1;
+    if (count > 0 && looksLikeHeader(firstName + ' ' + firstAfterfix, firstNumber)) start = 1;
 
     for (var i = start; i < count; i++) {
       var name = (names[i] || '').trim();
+      var rowAfterfix = (afterfixes[i] || '').trim() || fallbackAfterfix;
       var number = normalizeNumber(numbers[i] || '');
-      if (!name && !number) continue;
+      if (!name && !number && !rowAfterfix) continue;
       if (!isValidNumber(number) || !number) {
         skipped += 1;
         continue;
       }
-      contacts.push({ prefix: prefix, afterfix: afterfix, name: name, number: number });
+      contacts.push({ prefix: prefix, afterfix: rowAfterfix, name: name, number: number });
       added += 1;
     }
 
@@ -296,6 +300,7 @@
       listSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     if (pasteNames) pasteNames.value = '';
+    if (pasteAfterfix) pasteAfterfix.value = '';
     if (pasteNumbers) pasteNumbers.value = '';
     alert('已匯入 ' + added + ' 筆，已顯示在右邊名單。\n跳過 ' + skipped + ' 筆（整理後仍不是電話號碼）。');
   }

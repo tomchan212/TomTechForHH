@@ -66,6 +66,13 @@
           rows="6"
           placeholder="貼上姓名，一行一個"
         ></textarea>
+        <label for="paste-afterfix">Afterfix（Excel 一整欄）</label>
+        <textarea
+          id="paste-afterfix"
+          class="paste-excel"
+          rows="6"
+          placeholder="貼上 Afterfix，一行一個，順序要跟姓名一樣"
+        ></textarea>
         <label for="paste-numbers">電話（Excel 一整欄）</label>
         <textarea
           id="paste-numbers"
@@ -142,7 +149,7 @@
         </ul>
 
         <p><span class="help-q">從 Excel 貼上怎麼用？</span><br>
-        在 Excel 先複製姓名那一欄，貼進<span class="help-field">「姓名」</span>；再複製電話那一欄，貼進<span class="help-field">「電話」</span>。兩欄要同一順序，一行對一行，然後按<span class="help-btn">「匯入」</span>。每一筆都會套用上面的 <span class="help-field">Prefix</span> 和 <span class="help-field">Afterfix</span>，並加在右邊名單後面。第一行如果是標題（例如「姓名」「電話」）會自動略過。電話有空格、橫線或文字的那一行會跳過，匯入後會告訴你跳過了幾筆。</p>
+        在 Excel 分別複製姓名、Afterfix、電話三欄，貼進對應的框。三欄要同一順序，一行對一行，然後按<span class="help-btn">「匯入」</span>。每一筆都會套用上面的 <span class="help-field">Prefix</span>。若某一行沒貼 Afterfix，就用上面那個 Afterfix。第一行如果是標題（例如「姓名」「電話」）會自動略過。電話有空格、橫線或文字的那一行會跳過，匯入後會告訴你跳過了幾筆。</p>
 
         <p><span class="help-q">按「+」按鈕會怎樣？</span><br>
         你填好上面三個空格之後，按一下左邊那個大大的<span class="help-btn">「+」</span>按鈕，這一筆「前綴 + 名字 + 號碼」就會被加進右邊的<span class="help-field">「加入名單」</span>表格裡。加完之後，左邊三個空格會清空，你可以繼續打下一筆。</p>
