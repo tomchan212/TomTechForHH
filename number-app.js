@@ -12,7 +12,8 @@
   const nameInput = document.getElementById('name');
   const numberInput = document.getElementById('number');
   const addRowBtn = document.getElementById('add-row');
-  const pasteExcel = document.getElementById('paste-excel');
+  const pasteNames = document.getElementById('paste-names');
+  const pasteNumbers = document.getElementById('paste-numbers');
   const importPasteBtn = document.getElementById('import-paste');
   const exportBtn = document.getElementById('export-add');
   const resetListBtn = document.getElementById('reset-list');
@@ -237,37 +238,33 @@
   }
 
   function importPastedExcel() {
-    var text = (pasteExcel && pasteExcel.value) || '';
-    var lines = text.split(/\r?\n/);
+    var names = ((pasteNames && pasteNames.value) || '').split(/\r?\n/);
+    var numbers = ((pasteNumbers && pasteNumbers.value) || '').split(/\r?\n/);
     var prefix = (prefixInput.value || '').trim();
     var added = 0;
     var skipped = 0;
-    var seenData = false;
+    var count = Math.max(names.length, numbers.length);
+    var start = 0;
+    var firstName = (names[0] || '').trim();
+    var firstNumber = (numbers[0] || '').trim();
+    if (count > 0 && looksLikeHeader(firstName, firstNumber)) start = 1;
 
-    lines.forEach(function (line) {
-      if (!line.trim()) return;
-      var parts = line.split('\t');
-      if (parts.length < 2) {
-        parts = line.trim().split(/\s{2,}/);
-      }
-      var name = (parts[0] || '').trim();
-      var number = (parts[1] || '').trim();
-      if (!seenData && looksLikeHeader(name, number)) {
-        seenData = true;
-        return;
-      }
-      seenData = true;
-      if (parts.length < 2 || !isValidNumber(number) || !number) {
+    for (var i = start; i < count; i++) {
+      var name = (names[i] || '').trim();
+      var number = (numbers[i] || '').trim();
+      if (!name && !number) continue;
+      if (!isValidNumber(number) || !number) {
         skipped += 1;
-        return;
+        continue;
       }
       contacts.push({ prefix: prefix, name: name, number: number });
       added += 1;
-    });
+    }
 
     renderList();
-    if (pasteExcel) pasteExcel.value = '';
-    alert('已匯入 ' + added + ' 筆。\n跳過 ' + skipped + ' 筆（電話有空格、橫線、文字，或不是兩欄）。');
+    if (pasteNames) pasteNames.value = '';
+    if (pasteNumbers) pasteNumbers.value = '';
+    alert('已匯入 ' + added + ' 筆。\n跳過 ' + skipped + ' 筆（電話有空格、橫線、文字，或對不到姓名）。');
   }
 
   if (importPasteBtn) {
